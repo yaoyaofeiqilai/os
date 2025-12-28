@@ -1,15 +1,15 @@
-img=/home/john/os/hd30M.img
+img=/home/yaoyao/public/bochs/bin/hd60M.img
 
 BUILD_DIR = ./build
 ENTRY_POINT = 0xc0001500
 AS = nasm
 CC = gcc
 LD = ld
-LIB = -I lib/ -I lib/kernel/ -I lib/user/ -I kernel/ -I device/ -I thread/ -I userprog/ -I fs/
+LIB = -m32 -I lib/ -m32 -I lib/kernel/ -m32 -I lib/user/ -m32 -I kernel/ -m32 -I device/ -m32 -I thread/ -m32 -I userprog/ -m32 -I fs/
 ASFLAGS = -f elf
 CFLAGS = -Wall $(LIB) -c -fno-builtin  -fno-stack-protector -W -Wstrict-prototypes \
          -Wmissing-prototypes 
-LDFLAGS = -Ttext $(ENTRY_POINT) -e main -Map $(BUILD_DIR)/kernel.map
+LDFLAGS = -m elf_i386 -Ttext $(ENTRY_POINT) -e main -Map $(BUILD_DIR)/kernel.map
 OBJS = $(BUILD_DIR)/main.o $(BUILD_DIR)/init.o $(BUILD_DIR)/interrupt.o \
       $(BUILD_DIR)/timer.o $(BUILD_DIR)/kernel.o $(BUILD_DIR)/print.o \
       $(BUILD_DIR)/debug.o $(BUILD_DIR)/memory.o $(BUILD_DIR)/bitmap.o \
@@ -172,10 +172,7 @@ mbr_loader:
 	nasm -I boot/include/ -o boot/loader.bin boot/loader.S
 
 all: mk_dir build mbr_loader
-
 image:
-	@-rm -rf $(img)
-	bximage -hd -mode="flat" -size=30 -q $(img)
 	dd if=./boot/mbr.bin of=$(img) bs=512 count=1 conv=notrunc
 	dd if=./boot/loader.bin of=$(img) bs=512 seek=2 count=3 conv=notrunc
 	dd if=$(BUILD_DIR)/kernel.bin of=$(img) bs=512 seek=9 count=200 conv=notrunc
@@ -193,3 +190,7 @@ clean:
 	@-rm -rf kernel/*.img kernel/*.bin kernel/*.o kernel/*~
 	@-rm -rf *.o *.bin *.img *~
 
+cd1:
+	cd /home/yaoyao/public/bochs/bin && ./bochs -f lsgbochsrc.disk
+
+  
